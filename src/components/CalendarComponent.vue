@@ -31,13 +31,13 @@
             <div :data-is-today="day.isToday" :class="day.cellClass">{{ day.day }}</div>
             <ul class="scheduleList">
               <li class="schedule" v-for="(schedule, k) in schedules[day.date]" :key="k">
-                <a :href="schedule.id">
+                <RouterLink :to="{path : '/concertDetail', state : { concertId : schedule.id}}">
                   <img :src="schedule.image" alt="포스터" class="poster">
                   <div class="scheduleInfo">
                     <span class="openDate">OPEN <b>{{ getHours(schedule.dateTime) }}</b></span>
                     <span class="title">{{ schedule.title }}</span>
                   </div>
-                </a>
+                </RouterLink>
               </li>
             </ul>
           </div>
@@ -165,7 +165,7 @@ function getHours(date) {
 </script>
 
 
-<style>
+<style scoped>
 #calendar_header {
   display: flex;
 

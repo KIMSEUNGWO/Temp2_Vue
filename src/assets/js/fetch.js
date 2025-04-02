@@ -12,10 +12,29 @@ export function fetchGet(url, callback) {
         'result' : 'OK',
         'data' : {
             'totalElements' : 30,
-            'totalPages' : 50,
-            'pageNumber' : 0,
+            'totalPages' : 9,
+            'pageNumber' : 3,
+            'word' : '테스트임~',
+            'status' : '어쩌구',
             'content' : [
-                1,2,3
+                {
+                    'artistId' : 1,
+                    'image' : 'null',
+                    'name' : '김승우',
+                    'status' : '어쩌구',
+                },
+                {
+                    'artistId' : 2,
+                    'image' : 'null',
+                    'name' : '김승우',
+                    'status' : '어쩌구',
+                },
+                {
+                    'artistId' : 3,
+                    'image' : 'null',
+                    'name' : '김승우',
+                    'status' : '어쩌구',
+                },
             ]
         }
     });

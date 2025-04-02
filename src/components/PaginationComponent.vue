@@ -1,8 +1,8 @@
 <template>
-  <div id="pagintaion">
+  <div id="pagination">
     <div class="group">
       <div class="group-left">
-        <h4 class="total">총 0건</h4>
+        <h4 class="total">총 {{ total }}건</h4>
       </div>
       <div class="group-right">
         <div class="input-box">
@@ -10,44 +10,38 @@
             <path d="M8.74998 14.1667C11.7415 14.1667 14.1666 11.7415 14.1666 8.75C14.1666 5.75846 11.7415 3.33333 8.74998 3.33333C5.75844 3.33333 3.33331 5.75846 3.33331 8.75C3.33331 11.7415 5.75844 14.1667 8.74998 14.1667Z" stroke="#767676" stroke-width="1.5" stroke-miterlimit="10"/>
             <path d="M16.1363 17.197C16.4292 17.4899 16.9041 17.4899 17.197 17.197C17.4899 16.9041 17.4899 16.4292 17.197 16.1363L16.1363 17.197ZM11.9697 13.0303L16.1363 17.197L17.197 16.1363L13.0303 11.9697L11.9697 13.0303Z" fill="#767676"/>
           </svg>
-          <input type="text" style="width: 330px;" class="inputBox" name="searchWord" id="searchWord" placeholder="이름을 입력해주세요.">
+          <input v-model="searchKeyword" @keyup.enter="handleSearchBtn" type="text" style="width: 330px;" class="inputBox" name="word" id="searchWord" placeholder="이름을 입력해주세요.">
         </div>
-        <button id="delete">삭제</button>
-        <button id="add">등록</button>
+        <slot name="condition-slot"></slot>
+        <slot name="extra-slot"></slot>
       </div>
     </div>
     <div id="result" class="box">
       <ul class="searchResult" id="searchTitle">
         <a disabled>
-          <li>
-            <button type="button" id="checker" class="checkbox">
-              <svg width="16" height="16" viewBox="0 0 13 13" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <path fill-rule="evenodd" clip-rule="evenodd" d="M1 3.5C1 2.11929 2.11929 1 3.5 1H9.5C10.8807 1 12 2.11929 12 3.5V9.5C12 10.8807 10.8807 12 9.5 12H3.5C2.11929 12 1 10.8807 1 9.5V3.5ZM3.5 0C1.567 0 0 1.567 0 3.5V9.5C0 11.433 1.567 13 3.5 13H9.5C11.433 13 13 11.433 13 9.5V3.5C13 1.567 11.433 0 9.5 0H3.5ZM9.92326 4.64858C10.1206 4.42886 10.1206 4.07202 9.92326 3.85229H9.92484C9.72753 3.63257 9.40711 3.63257 9.2098 3.85229L5.52572 7.95327L3.86204 6.10229C3.66473 5.88257 3.34431 5.88257 3.147 6.10229C2.9497 6.32202 2.9497 6.67886 3.147 6.89858L5.16741 9.14858C5.36472 9.36831 5.68514 9.36831 5.88245 9.14858L9.92326 4.64858Z"/>
-              </svg>
-            </button>
-          </li>
-          <li>번호</li>
-          <li>이미지</li>
-          <li>이름</li>
-          <li>상태</li>
+          <slot name="table-top-slot"></slot>
         </a>
       </ul>
       <ul class="searchResult" id="searchResult">
-        <a class="none">검색 결과가 없습니다.</a>
+        <slot name="table-result-slot"></slot>
       </ul>
     </div>
     <div class="pagination">
-      <button type="button" class="button_first" disabled="true" id="first-page">
+      <button @click="goToFirst()" :disabled="page < 2" type="button" class="button_first" id="first-page">
         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><path d="M41.4 233.4c-12.5 12.5-12.5 32.8 0 45.3l160 160c12.5 12.5 32.8 12.5 45.3 0s12.5-32.8 0-45.3L109.3 256 246.6 118.6c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0l-160 160zm352-160l-160 160c-12.5 12.5-12.5 32.8 0 45.3l160 160c12.5 12.5 32.8 12.5 45.3 0s12.5-32.8 0-45.3L301.3 256 438.6 118.6c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0z"/></svg>
       </button>
-      <button type="button" class="button_previous" disabled="true" id="prev-page">
+      <button @click="goToPrev()" :disabled="page < 2" type="button" class="button_previous" id="prev-page">
         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 512"><path d="M41.4 233.4c-12.5 12.5-12.5 32.8 0 45.3l160 160c12.5 12.5 32.8 12.5 45.3 0s12.5-32.8 0-45.3L109.3 256 246.6 118.6c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0l-160 160z"/></svg>
       </button>
-      <ol class="page_list"></ol>
-      <button type="button" class="button_next" id="next-page">
+      <ol class="page_list">
+        <li v-for="i in pageBtnList" :key="i" class="page" :class="{selected : i === page}">
+          <button @click="goToPage(i)" type="button" class="page_link">{{ i }}</button>
+        </li>
+      </ol>
+      <button @click="goToNext()" :disabled="page >= totalPage" type="button" class="button_next" id="next-page">
         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 512"><path d="M278.6 233.4c12.5 12.5 12.5 32.8 0 45.3l-160 160c-12.5 12.5-32.8 12.5-45.3 0s-12.5-32.8 0-45.3L210.7 256 73.4 118.6c-12.5-12.5-12.5-32.8 0-45.3s32.8-12.5 45.3 0l160 160z"/></svg>
       </button>
-      <button type="button" class="button_last" id="last-page">
+      <button @click="goToLast()" :disabled="page >= totalPage" type="button" class="button_last" id="last-page">
         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><path d="M470.6 278.6c12.5-12.5 12.5-32.8 0-45.3l-160-160c-12.5-12.5-32.8-12.5-45.3 0s-12.5 32.8 0 45.3L402.7 256 265.4 393.4c-12.5 12.5-12.5 32.8 0 45.3s32.8 12.5 45.3 0l160-160zm-352 160l160-160c12.5-12.5 12.5-32.8 0-45.3l-160-160c-12.5-12.5-32.8-12.5-45.3 0s-12.5 32.8 0 45.3L210.7 256 73.4 393.4c-12.5 12.5-12.5 32.8 0 45.3s32.8 12.5 45.3 0z"/></svg>
       </button>
     </div>
@@ -55,14 +49,140 @@
 </template>
 
 <script setup>
-import {PageData, Pagination} from "@/assets/js/pagination.js";
+import {ref} from "vue";
+import {fetchGet} from "@/assets/js/fetch.js";
+
+// count : 페이지네이션할 개수
+const props = defineProps({
+  count: {
+    type: Number,
+    default: 10
+  },
+  mapping: {
+    type: String,
+  },
+  condition: {
+    type: Object,
+    default: () => ({})
+  }
+});
+const emit = defineEmits(['update-data']);
+
+const total = ref(0);
+const page = ref(1);
+const totalPage = ref(10);
+const searchKeyword = ref('');
+const dataList = ref([]);
+
+const pageBtnList = ref([1]);
+
+search();
+function search() {
+  dataList.value = [];
+  const requestURI = props.mapping + getConditionRequestParam();
+  fetchGet(requestURI, searchResult);
+}
+function searchResult(result) {
+  const requestURI = props.mapping + getConditionRequestParam();
+  history.pushState({data : result}, '',  requestURI);
+  onPopState(result);
+}
+function onPopState(result) {
+  setConditionData(result.data);
+  if (result.result !== 'OK') return;
+  const pageable = result.data;
+  setVariablePagination(pageable);
+  pagination(pageable);
+
+}
+
+function setConditionData(pageable) {
+  searchKeyword.value = (pageable != null) ? pageable.word : '';
+  for (let key in props.condition) {
+    props.condition[key].setData(pageable);
+  }
+}
+function getConditionRequestParam() {
+  let param = '?';
+  let pageParam = createParam('page', page.value);
+  if (pageParam != null) param += pageParam;
+  let wordParam = createParam('word', searchKeyword.value);
+  if (wordParam != null) param += wordParam;
+
+  for (let key in props.condition) {
+    if (props.condition.hasOwnProperty(key)) {
+      let conditionParam = createParam(key, props.condition[key].getData());
+      if (conditionParam != null) {
+        // 첫 번째 파라미터가 아니면 '&' 추가
+        param += (param.length > 1 ? '&' : '') + conditionParam;
+      }
+    }
+  }
+  return param;
+}
+function createParam(key, value) {
+  if (value === '' || value == null) return null;
+  return `${key}=${value}`;
+}
+
+function setVariablePagination(pageable) {
+  total.value = pageable.totalElements;
+  totalPage.value = pageable.totalPages;
+  page.value = pageable.pageNumber + 1;
+  searchKeyword.value = pageable.word;
+  emit('update-data', pageable.content);
+}
+function pagination() {
+  let pageCount = Math.floor(page.value / props.count);
+  const startNum = Math.max(0, (pageCount) * props.count) + 1;
+  console.log(`pageCount : ${pageCount}, startNum : ${startNum}, totalPage : ${totalPage.value}`);
+
+  generatePageBtnList(startNum, props.count, totalPage.value);
+}
+
+function generatePageBtnList(startNum, count, lastPageNum) {
+  const list = [];
+  for (let i=startNum;i < startNum+count && i <= lastPageNum;i++) {
+    list.push(i);
+  }
+  pageBtnList.value = list;
+}
+function goToFirst() {
+  page.value = 1;
+  search();
+}
+function goToPrev() {
+  page.value = Math.max(0, page.value - 1);
+  search();
+}
+function goToNext() {
+  page.value = Math.min(totalPage.value, page.value + 1);
+  search();
+}
+function goToLast() {
+  page.value = totalPage.value;
+  search();
+}
+function goToPage(i) {
+  page.value = i;
+  search();
+}
+function handleSearchBtn() {
+  page.value = 1;
+  search();
+}
+
+class PageData {
+
+  constructor(getData, setData) {
+    this.getData = getData;
+    this.setData = setData;
+  }
+}
 </script>
 
 
-<style scoped>
-h1 {
-  color: #5F43FF;
-}
+<style>
 .group {
   display: flex;
   justify-content: space-between;
@@ -133,9 +253,6 @@ h1 {
   color: var(--main-color);
 }
 
-.pagination .page_link:hover {
-  background: var(--main-color-2);
-}
 
 .pagination .page_link {
   position: relative;
@@ -192,5 +309,11 @@ h1 {
 }
 
 
+#result.box {
+  padding: 24px;
+}
+.input-box {
+  width: 250px;
+}
 
 </style>

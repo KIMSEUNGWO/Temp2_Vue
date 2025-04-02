@@ -4,7 +4,7 @@ import CalendarComponent from "@/components/CalendarComponent.vue";
 </script>
 
 <template>
-  <CalendarComponent></CalendarComponent>
+    <CalendarComponent></CalendarComponent>
 </template>
 
 <style scoped>

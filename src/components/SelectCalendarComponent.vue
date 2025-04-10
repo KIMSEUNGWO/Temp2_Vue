@@ -1,5 +1,5 @@
 <template>
-  <div class="date_picker">
+  <div class="date_picker box">
     <div id="calendar_header">
       <button type="button" id="preButton" @click="localDate.prev(); renderCalendar();">
         <svg transform='rotate(180)' xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 512">
@@ -17,7 +17,7 @@
         </svg>
       </button>
     </div>
-    <div id="calendar_body" class="box">
+    <div id="calendar_body">
       <div id="mainBody">
         <div class="week">
           <div v-for="(week, i) in weeks" :key="i" class="cell">
@@ -27,20 +27,9 @@
           </div>
         </div>
         <div v-for="(week, i) in days" :key="i" class="week">
-          <div v-for="(day, j) in week" :key="j" class="cell" :class="{ other: !day.isCurrentMonth }">
-            <div :data-is-today="day.isToday" :class="day.cellClass">{{ day.day }}</div>
-            <ul class="scheduleList">
-              <li class="schedule" v-for="(schedule, k) in schedules[day.date]" :key="k">
-                <RouterLink :to="{path : '/concertDetail', state : { concertId : schedule.id}}">
-                  <img :src="schedule.image" alt="포스터" class="poster">
-                  <div class="scheduleInfo">
-                    <span class="openDate">OPEN <b>{{ getHours(schedule.dateTime) }}</b></span>
-                    <span class="title">{{ schedule.title }}</span>
-                  </div>
-                </RouterLink>
-              </li>
-            </ul>
-          </div>
+          <button type="button" @click="onSelect(day.date)" v-for="(day, j) in week" :key="j" class="cell" :class="{ other: !day.isCurrentMonth }">
+            <div :data-is-today="day.isToday" :data-is-select="day.isSelected" :class="day.cellClass">{{ day.day }}</div>
+          </button>
         </div>
       </div>
     </div>
@@ -53,8 +42,23 @@ import {LocalDate} from "../assets/js/localdate.js";
 import {Schedule, ScheduleManager} from "../assets/js/schedule.js";
 import {Server} from "@/stores/server.js";
 
+const props = defineProps({
+  focus: {
+    type: Object,
+    default: null
+  }
+})
+const emit = defineEmits(['selectDate'])
+const selectDate = props.focus != null ? new Date(props.focus.year, props.focus.month - 1, props.focus.day) : null;
+function isSelectDate(date) {
+  return date.getDate() === selectDate.getDate() &&
+      date.getMonth() === selectDate.getMonth() &&
+      date.getFullYear() === selectDate.getFullYear();
+}
+function onSelect(date) {
+  emit('selectDate', date);
+}
 const localDate = new LocalDate();
-const scheduleManager = new ScheduleManager();
 
 const renderCalendar = () => {
   render();
@@ -64,7 +68,6 @@ const renderCalendar = () => {
 const header = ref('');
 const weeks = ['일', '월', '화', '수', '목', '금', '토'];
 const days = ref([]);
-const schedules = ref([]);
 
 onMounted(() => {
   renderCalendar();
@@ -72,12 +75,13 @@ onMounted(() => {
 
 class DayData {
 
-  constructor(isCurrentMonth, isToday, cellClass, day, date) {
+  constructor(isCurrentMonth, isToday, cellClass, day, date, isSelected) {
     this.isCurrentMonth = isCurrentMonth;
     this.isToday = isToday;
     this.cellClass = cellClass;
     this.day = day;
     this.date = date;
+    this.isSelected = isSelected;
   }
 }
 
@@ -101,12 +105,13 @@ function render() {
       const day = date.getDate();
       const isToday = localDate.isToday(date);
       const isCurrentMonth = localDate.isCurrentMonth(date);
+      const isSelectedDate = isSelectDate(date);
 
       let cellClass = '';
       if (j === 0) cellClass = 'SUN'; // 일요일
       else if (j === 6) cellClass = 'SAT'; // 토요일
 
-      weekArray.push(new DayData(isCurrentMonth, isToday, cellClass, day, dateToString(date)))
+      weekArray.push(new DayData(isCurrentMonth, isToday, cellClass, day, date, isSelectedDate))
     }
     inputDayArray.push(weekArray);
   }
@@ -123,45 +128,8 @@ function dateToString(date) {
 
 function onChanged(year, month) {
 
-  Server.fetchGet(`/schedules?year=${year}&month=${month}`)
-      .then(schedules => {
-        scheduleManager.addAll(new Date(), [
-          new Schedule(
-              1,
-              'Frame 1707485619.jpg',
-              '어쨌든 새학기새학기새학기새학기새학기새학기새학기새학기새학기새학기새학기새학기새학기',
-              new Date(2025, 1, 28, 16, 30)
-          ),
-          new Schedule(
-              2,
-              'Frame 1707485619.jpg',
-              '어쨌든 새학기',
-              new Date(2025, 2, 20, 16, 30)
-          ),
-          new Schedule(
-              3,
-              'Frame 1707485619.jpg',
-              '22어쨌든 새학기',
-              new Date(2025, 2, 20, 17, 20)
-          ),
-          new Schedule(
-              5,
-              'Frame 1707485619.jpg',
-              '233어쨌든 새학기',
-              new Date(2025, 2, 20, 19, 0)
-          ),
-        ]);
-      })
-  scheduleRender();
 }
 
-function scheduleRender() {
-  const currentMonth = `${format(localDate.year)}-${format(localDate.month)}`;
-  let schedule = scheduleManager.get(currentMonth);
-
-  if (!schedule) return; // 해당 월의 스케줄 데이터가 없으면 종료
-  schedules.value = schedule;
-}
 
 function getHours(date) {
   return `${format(date.getHours())}:${format(date.getMinutes())}`;
@@ -173,9 +141,9 @@ function getHours(date) {
 <style scoped>
 #calendar_header {
   display: flex;
-
+  align-content: center;
+  justify-content: center;
   gap: 12px;
-  margin-bottom: 20px;
 }
 
 .months {
@@ -194,7 +162,7 @@ function getHours(date) {
 }
 
 
-#nextButton:disabled svg, #preButton:disabled svg {
+#nextButton:disabled svg, #preButton:disabled svg{
   fill: #999;
 }
 
@@ -205,26 +173,23 @@ function getHours(date) {
   column-gap: 2rem;
   padding: 10px;
 }
-
 #calendar_body > #mainBody {
   width: 100%;
 }
 
 .week {
   display: grid;
-  grid-template-columns: repeat(7, 1fr);
-  border-bottom: 2px #eee solid;
+  grid-template-columns: repeat(7, 45px);
   gap: 0;
 }
 
-.week:not(:first-child) > .cell:not(:last-child) {
-  border-right: 2px #eee solid;
+.cell div[data-is-select="true"] {
+  background-color: var(--main-color);
+  color: white;
 }
 
 .cell div[data-is-today="true"] {
-  background-color: var(--main-color);
-  border-radius: 4px;
-  color: white;
+  text-decoration: underline;
 }
 
 .cell {
@@ -233,7 +198,10 @@ function getHours(date) {
   display: flex;
   align-items: center;
   justify-content: flex-start;
-  padding: 10px 0;
+  padding: 5px;
+}
+.cell:hover div {
+  background-color: var(--main-color-background);
 }
 
 
@@ -241,15 +209,13 @@ function getHours(date) {
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 100%;
-  height: 30px;
+  width: 350px;
+  height: 35px;
+  border-radius: 4px;
   font-size: var(--fs-14);
 }
-
 .cell > div:not(.top) {
-  height: 20px;
   font-size: var(--fs-16);
-  margin-bottom: 10px;
 }
 
 .SAT {
@@ -260,75 +226,10 @@ function getHours(date) {
   color: #FF2D55;
 }
 
+
 /* 오늘 이전 날짜는 선택 x */
 .cell.other div {
   color: var(--f3);
-}
-
-
-.cell {
-  display: flex;
-  flex-direction: column;
-  overflow: hidden;
-}
-
-.scheduleList {
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  gap: 12px;
-  width: 100%;
-  min-height: 50px;
-  padding: 0 5px;
-}
-.schedule {
-  min-height: 50px;
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  max-width: 100%;
-}
-.schedule > a {
-  display: flex;
-  align-items: center;
-  justify-content: flex-start;
-  text-decoration: none;
-  gap: 6px;
-  width: 100%;
-  overflow: hidden;
-}
-
-
-.schedule::before {
-  content: '';
-  display: inline-block;
-  width: 7px;
-  height: 7px;
-  border-radius: 100%;
-  background-color: var(--main-color);
-}
-
-.scheduleInfo {
-  display: flex;
-  align-content: center;
-  flex-direction: column;
-  gap: 2px;
-  overflow: hidden;
-
-}
-.openDate {
-  font-size: var(--fs-12);
-  color: var(--f3);
-  font-weight: 400;
-}
-.scheduleInfo .title {
-  font-weight: 500;
-  font-size: var(--fs-14);
-  color: var(--f2);
-  white-space: nowrap;        /* 텍스트가 줄바꿈 되지 않도록 설정 */
-  overflow: hidden;           /* 넘치는 콘텐츠 숨김 */
-  text-overflow: ellipsis;    /* 넘치는 부분을 ...으로 표시 */
-
 }
 
 

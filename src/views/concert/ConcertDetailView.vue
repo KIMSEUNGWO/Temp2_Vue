@@ -17,7 +17,7 @@
   </div>
 
   <div class="concert">
-    <img class="poster" src="/Frame 1707485619.jpg" alt="">
+    <img class="poster" src="/Frame%201707485619.jpg" alt="">
     <div class="concert-info">
       <div class="extra-info">
         <div class="box info-card">
@@ -138,7 +138,7 @@
 <script setup>
 
 import {onMounted, onUnmounted, ref} from "vue";
-import ConcertSettingModal from "@/components/ConcertSettingModal.vue";
+import ConcertSettingModal from "@/views/concert/ConcertSettingModal.vue";
 
 const isShowSettingModal = ref(false);
 

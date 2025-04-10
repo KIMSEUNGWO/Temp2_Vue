@@ -5,7 +5,13 @@ import {RouterView} from "vue-router";
 </script>
 
 <template>
+  <TheHeader></TheHeader>
+  <div class="container">
+    <TheMenu></TheMenu>
+    <main>
       <RouterView/>
+    </main>
+  </div>
 </template>
 
 <style scoped>

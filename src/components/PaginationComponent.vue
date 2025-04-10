@@ -10,7 +10,7 @@
             <path d="M8.74998 14.1667C11.7415 14.1667 14.1666 11.7415 14.1666 8.75C14.1666 5.75846 11.7415 3.33333 8.74998 3.33333C5.75844 3.33333 3.33331 5.75846 3.33331 8.75C3.33331 11.7415 5.75844 14.1667 8.74998 14.1667Z" stroke="#767676" stroke-width="1.5" stroke-miterlimit="10"/>
             <path d="M16.1363 17.197C16.4292 17.4899 16.9041 17.4899 17.197 17.197C17.4899 16.9041 17.4899 16.4292 17.197 16.1363L16.1363 17.197ZM11.9697 13.0303L16.1363 17.197L17.197 16.1363L13.0303 11.9697L11.9697 13.0303Z" fill="#767676"/>
           </svg>
-          <input v-model="searchKeyword" @keyup.enter="handleSearchBtn" type="text" style="width: 330px;" class="inputBox" name="word" id="searchWord" placeholder="이름을 입력해주세요.">
+          <input v-model="searchKeyword" @keyup.enter="handleSearchBtn" type="text" style="width: 330px;" class="inputBox" name="word" id="searchWord" :placeholder="placeholder">
         </div>
         <slot name="condition-slot"></slot>
         <slot name="extra-slot"></slot>
@@ -50,7 +50,7 @@
 
 <script setup>
 import {ref} from "vue";
-import {fetchGet} from "@/assets/js/fetch.js";
+import {Server} from "@/stores/server.js";
 
 // count : 페이지네이션할 개수
 const props = defineProps({
@@ -64,6 +64,10 @@ const props = defineProps({
   condition: {
     type: Object,
     default: () => ({})
+  },
+  placeholder: {
+    type: String,
+    default: '이름을 입력해주세요.',
   }
 });
 const emit = defineEmits(['update-data']);
@@ -80,7 +84,7 @@ search();
 function search() {
   dataList.value = [];
   const requestURI = props.mapping + getConditionRequestParam();
-  fetchGet(requestURI, searchResult);
+  Server.fetchGet(requestURI)
 }
 function searchResult(result) {
   const requestURI = props.mapping + getConditionRequestParam();
@@ -291,18 +295,20 @@ class PageData {
   background-color: #F7F7FB;
 }
 
-.searchResult > a {
+.searchResult > a, .searchResult > button {
   display: grid;
   align-items: center;
   justify-items: center;
   height: 40px;
   text-decoration: none;
 }
-.searchResult > a:hover:not(#searchTitle > a) {
+.searchResult > a:hover:not(#searchTitle > a),
+.searchResult > button:hover:not(#searchTitle > a){
   background-color: #fff9f9;
   border-radius: 5px;
 }
-.searchResult > a > li {
+.searchResult > a > li,
+.searchResult > button > li {
   display: flex;
   align-items: center;
   justify-content: center;

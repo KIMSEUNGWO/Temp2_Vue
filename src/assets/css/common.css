@@ -59,6 +59,7 @@ button {
     border: none;
     cursor: pointer;
     background-color: transparent;
+    padding: 0;
 }
 button * {
     pointer-events: none;
@@ -128,4 +129,15 @@ span {
 }
 .profile {
     border-radius: 100%;
+}
+
+a {
+    text-decoration: none;
+}
+
+.absolute {
+    position: absolute;
+}
+.relative {
+    position: relative;
 }

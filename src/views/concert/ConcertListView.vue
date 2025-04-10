@@ -10,7 +10,7 @@
 
       <template #extra-slot>
         <button id="delete">삭제</button>
-        <button id="add">등록</button>
+        <RouterLink to="/concert/new" id="add">등록</RouterLink>
       </template>
 
 
@@ -50,7 +50,7 @@
 
     </PaginationComponent>
 
-  <RouterLink :to="{ path: '/concertDetail', state: { concertId: 1 } }">
+  <RouterLink to="/concert/1">
     공연상세 테스트
   </RouterLink>
   </template>

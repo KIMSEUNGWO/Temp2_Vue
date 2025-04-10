@@ -40,11 +40,11 @@ export class LocalDate {
         return date.getDate() === this.today.getDate() &&
                date.getMonth() === this.today.getMonth() &&
                date.getFullYear() === this.today.getFullYear();
-      }
+    }
     
-      isCurrentMonth(date) {
+    isCurrentMonth(date) {
         return date.getMonth() === this.month - 1;
-      }
+    }
 
     generate() {
         const result = [];

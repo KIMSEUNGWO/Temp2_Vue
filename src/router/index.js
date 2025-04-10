@@ -6,26 +6,47 @@ const router = createRouter({
   routes: [
     {
       path: '/',
-      name: 'Home',
-      component: import('@/views/HomeView.vue'),
-      children: []
+      component: import('@/layouts/TheMain.vue'),
+      children: [
+        {
+          path: '',
+          name: 'Home',
+          component: import('@/views/HomeView.vue')
+        },
+        {
+          path: 'artist',
+          name: 'Artists',
+          component: import('@/views/artist/ArtistListView.vue'),
+        },
+        {
+          path: 'concert',
+          name: 'Concerts',
+          component: import('@/views/concert/ConcertListView.vue'),
+        },
+        {
+          path: 'concert/new',
+          name: 'Create Concert',
+          component: import('@/views/concert/CreateConcertView.vue'),
+        },
+        {
+          path: 'concert/:concertId',
+          name: 'ConcertDetail',
+          component: import('@/views/concert/ConcertDetailView.vue'),
+          props: true // URL 파라미터를 컴포넌트의 props로 전달
+        },
+
+      ]
     },
     {
-      path: '/artist',
-      name: 'Artists',
-      component: import('@/views/ArtistListView.vue'),
+      path: '/popup/artist',
+      name: 'Popup Select Artist',
+      component: import('@/popups/SelectArtistPopup.vue'),
     },
     {
-      path: '/concert',
-      name: 'Concerts',
-      component: import('@/views/ConcertListView.vue'),
+      path: '/popup/location',
+      name: 'Popup Select Location',
+      component: import('@/popups/SelectLocationPopup.vue'),
     },
-    {
-      path: '/concertDetail',
-      name: 'ConcertDetail',
-      component: import('@/views/ConcertDetailView.vue'),
-      props: true // URL 파라미터를 컴포넌트의 props로 전달
-    }
   ],
 })
 

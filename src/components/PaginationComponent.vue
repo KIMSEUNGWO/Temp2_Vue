@@ -301,6 +301,7 @@ class PageData {
   justify-items: center;
   height: 40px;
   text-decoration: none;
+  width: 100%;
 }
 .searchResult > a:hover:not(#searchTitle > a),
 .searchResult > button:hover:not(#searchTitle > a){

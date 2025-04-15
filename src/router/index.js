@@ -6,32 +6,32 @@ const router = createRouter({
   routes: [
     {
       path: '/',
-      component: import('@/layouts/TheMain.vue'),
+      component: () => import('@/layouts/TheMain.vue'),
       children: [
         {
           path: '',
           name: 'Home',
-          component: import('@/views/HomeView.vue')
+          component: () => import('@/views/HomeView.vue')
         },
         {
           path: 'artist',
           name: 'Artists',
-          component: import('@/views/artist/ArtistListView.vue'),
+          component: () => import('@/views/artist/ArtistListView.vue'),
         },
         {
           path: 'concert',
           name: 'Concerts',
-          component: import('@/views/concert/ConcertListView.vue'),
+          component: () => import('@/views/concert/ConcertListView.vue'),
         },
         {
           path: 'concert/new',
           name: 'Create Concert',
-          component: import('@/views/concert/CreateConcertView.vue'),
+          component: () => import('@/views/concert/CreateConcertView.vue'),
         },
         {
           path: 'concert/:concertId',
           name: 'ConcertDetail',
-          component: import('@/views/concert/ConcertDetailView.vue'),
+          component: () => import('@/views/concert/ConcertDetailView.vue'),
           props: true // URL 파라미터를 컴포넌트의 props로 전달
         },
 
@@ -40,12 +40,22 @@ const router = createRouter({
     {
       path: '/popup/artist',
       name: 'Popup Select Artist',
-      component: import('@/popups/SelectArtistPopup.vue'),
+      component: () => import('@/popups/SelectArtistPopup.vue'),
+    },
+    {
+      path: '/popup/artist/new',
+      name: 'Popup New Artist',
+      component: () => import('@/popups/ArtistNewPopup.vue'),
+    },
+    {
+      path: '/popup/artist/:artistId',
+      name: 'Popup Artist Detail',
+      component: () => import('@/popups/ArtistDetailPopup.vue'),
     },
     {
       path: '/popup/location',
       name: 'Popup Select Location',
-      component: import('@/popups/SelectLocationPopup.vue'),
+      component: () => import('@/popups/SelectLocationPopup.vue'),
     },
   ],
 })

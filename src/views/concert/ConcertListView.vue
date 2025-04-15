@@ -10,7 +10,8 @@
 
       <template #extra-slot>
         <button id="delete">삭제</button>
-        <RouterLink to="/concert/new" id="add">등록</RouterLink>
+        <RouterLink :to="{ path: '/concert/new', state: { type: 'EDIT', id: 3 } }" id="add">수정테스트</RouterLink>
+        <RouterLink :to="{ path: '/concert/new', state: { type: 'NEW' } }" id="add">등록</RouterLink>
       </template>
 
 
